@@ -1,12 +1,30 @@
 const express = require('express');
 const server = express();
 const bcrypt = require('bcryptjs');
+const cors = require('cors');
+const session = require('express-session');
 
 const Auth = require('./server-helpers.js');
 
-server.use(express.json());
+require('dotenv').config();
 
-server.get('/api/users', (req, res) => {
+const sessionConfig = {
+    name: 'sesh',
+    secret: process.env.SECRET,
+    cookie: {
+        maxAge: 1000 * 60 * 10,
+        secure: false,
+        httpOnly: true
+    },
+    resave: false,
+    saveUninitialized: true,
+}
+
+server.use(express.json());
+server.use(cors());
+server.use(session(sessionConfig));
+
+server.get('/api/users', checkAuth, (req, res) => {
     Auth.getUsers()
         .then((users) => {
             res.status(200).json({ data: users })
@@ -40,6 +58,7 @@ server.post('/api/login', (req, res) => {
     Auth.findUser(username)
         .then((user) => {
             if (user && bcrypt.compareSync(password, user.password)) {
+                req.session.user = user;
                 res.status(200).json({
                     message: `Welcome, ${user.username}`
                 })
@@ -56,5 +75,15 @@ server.post('/api/login', (req, res) => {
             })
         })
 })
+
+function checkAuth(req, res, next) {
+    if (req.session && req.session.user) {
+        next();
+    } else {
+        res.status(401).json({
+            message: 'You shall not pass!'
+        })
+    }
+}
 
 module.exports = server;
