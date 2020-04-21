@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useCookies } from 'react-cookie';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import Users from './components/Users';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
-  const [cookies] = useCookies('sesh');
-  // useEffect(() => {
-  //   axios
-  //     .post('http://localhost:5000/api/login', { username: 'jeengland', password: 'password'})
-  //     .then((response) => console.log(response))
-  //     .then((response) => console.log(cookies))
-  //     .catch((error) => console.error(error))
-  // }, [])
   return (
     <div className="App">
-      <div className='register'>
-        <RegisterForm />
-      </div>
-      <div className='login'>
-        <LoginForm />
-      </div>
+      <Router>
+        <Switch>
+          <Route exact path='/'>
+            <div className='register'>
+              <h1>Register:</h1>
+              <RegisterForm />
+            </div>
+            <div className='login'>
+              <h1>Login:</h1>
+              <LoginForm />
+            </div>
+          </Route>
+          <PrivateRoute exact path='/users' component={Users} />
+        </Switch>
+      </Router>
     </div>
   );
 }

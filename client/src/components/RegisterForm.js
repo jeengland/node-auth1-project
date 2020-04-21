@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosWithCreds from '../utils/axiosWithCreds';
 
 const RegisterForm = () => {
     const [state, setState] = useState({ username: '', password: '' });
@@ -11,7 +11,8 @@ const RegisterForm = () => {
     }
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://localhost:5000/api/register', state)
+        axiosWithCreds
+            .post('http://localhost:5000/api/register', state)
             .then((response) => {
                 console.log(response);
                 setState({ username: '', password: '' });

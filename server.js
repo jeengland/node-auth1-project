@@ -17,11 +17,11 @@ const sessionConfig = {
         httpOnly: true
     },
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
 }
 
 server.use(express.json());
-server.use(cors());
+server.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 server.use(session(sessionConfig));
 
 server.get('/api/users', checkAuth, (req, res) => {
@@ -74,6 +74,12 @@ server.post('/api/login', (req, res) => {
                 message: 'Unable to validate user.'
             })
         })
+})
+
+server.get('/api/authStatus', checkAuth, (req, res) => {
+    res.status(200).json({
+        message: 'Authorized'
+    })
 })
 
 function checkAuth(req, res, next) {
